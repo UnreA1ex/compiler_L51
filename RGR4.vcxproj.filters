@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов\test_progs">
+      <UniqueIdentifier>{0f829918-4d8f-4e79-8430-aca73980827c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы ресурсов\old_files">
+      <UniqueIdentifier>{0af7c226-5234-4d55-a372-6b574f952b34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы ресурсов\grammars">
+      <UniqueIdentifier>{68afec5a-981e-445d-a730-8e7d9df46006}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="SPGrammar.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Lexical_Analyzer L51.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="SA.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SPGrammar.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Lexical_Analyzer L51.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="multiset.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="SA.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\class_multiset\grammar_1.txt">
+      <Filter>Файлы ресурсов\grammars</Filter>
+    </Text>
+    <Text Include="..\class_multiset\grammar_2.txt">
+      <Filter>Файлы ресурсов\grammars</Filter>
+    </Text>
+    <Text Include="..\class_multiset\grammar_3.txt">
+      <Filter>Файлы ресурсов\grammars</Filter>
+    </Text>
+    <Text Include="..\class_multiset\grammar_4.txt">
+      <Filter>Файлы ресурсов\grammars</Filter>
+    </Text>
+    <Text Include="..\class_multiset\grammar_5.txt">
+      <Filter>Файлы ресурсов\grammars</Filter>
+    </Text>
+    <Text Include="..\class_multiset\grammar_6.txt">
+      <Filter>Файлы ресурсов\grammars</Filter>
+    </Text>
+    <Text Include="..\class_multiset\grammar_7.txt">
+      <Filter>Файлы ресурсов\grammars</Filter>
+    </Text>
+    <Text Include="test1.txt">
+      <Filter>Файлы ресурсов\test_progs</Filter>
+    </Text>
+    <Text Include="test2.txt">
+      <Filter>Файлы ресурсов\test_progs</Filter>
+    </Text>
+    <Text Include="test3.txt">
+      <Filter>Файлы ресурсов\test_progs</Filter>
+    </Text>
+    <Text Include="test4.txt">
+      <Filter>Файлы ресурсов\test_progs</Filter>
+    </Text>
+    <Text Include="test5.txt">
+      <Filter>Файлы ресурсов\test_progs</Filter>
+    </Text>
+    <Text Include="test6.txt">
+      <Filter>Файлы ресурсов\test_progs</Filter>
+    </Text>
+    <Text Include="grammar_8.txt">
+      <Filter>Файлы ресурсов\grammars</Filter>
+    </Text>
+    <Text Include="grammar.txt">
+      <Filter>Файлы ресурсов\grammars</Filter>
+    </Text>
+    <Text Include="test7.txt">
+      <Filter>Файлы ресурсов\test_progs</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\class_multiset\input1">
+      <Filter>Файлы ресурсов\old_files</Filter>
+    </None>
+    <None Include="..\class_multiset\input2">
+      <Filter>Файлы ресурсов\old_files</Filter>
+    </None>
+    <None Include="..\class_multiset\input3">
+      <Filter>Файлы ресурсов\old_files</Filter>
+    </None>
+    <None Include="..\class_multiset\input4">
+      <Filter>Файлы ресурсов\old_files</Filter>
+    </None>
+    <None Include="..\class_multiset\input5">
+      <Filter>Файлы ресурсов\old_files</Filter>
+    </None>
+    <None Include="..\class_multiset\input6">
+      <Filter>Файлы ресурсов\old_files</Filter>
+    </None>
+    <None Include="..\class_multiset\input7">
+      <Filter>Файлы ресурсов\old_files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,31 @@
+﻿S -> <announ><prog>
+<announ> -> <announ> <ann> | ε
+<ann> -> dim V <vl> as <type>;
+<vl> -> , V <vl> | ε
+<type> -> int | multiset
+<prog> -> <op> <prog> | <op>
+<op> -> <announ>
+<op> -> let V = <E>;
+<op> -> ;
+<op> -> while <test> do <prog> od;
+<op> -> for V from <E> to <E> <step> do <prog> od;
+<step> -> by <E> | ε
+<op> -> if ( <test> ) <prog> <els> fi;
+<els> -> els <prog> | ε
+<test> -> <E>R<E>
+<op> -> read V<op_in>;
+<op_in> -> , V<op_in> | ε
+<op> -> write <E><op_out>;
+<op_out> -> , <E><op_out> | ε
+<op> -> L:
+<op> -> jump L;
+<op> -> select <E> in case C: <prog> <mult_bran> <o_wise> ni;
+<mult_bran> -> case C: <prog> <mult_bran> | ε
+<o_wise> -> otherwise <prog> | ε
+<op> -> bad;
+<op> -> /* комментарий */
+<E> -> <E> + <T> | <E> - <T> | <T>
+<T> -> <T> * <F> | <T> / <F> | <T> % <F>
+<T> -> <T> & <F> | <T> ^ <F> | <F>
+<F> -> c | v | (<E>) | pow(<E>)
+<F> -> m | afm(<E>) | acs(<E>, <E>)

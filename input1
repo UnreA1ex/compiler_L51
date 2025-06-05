@@ -1,0 +1,3 @@
+push $$
+ji 1
+end

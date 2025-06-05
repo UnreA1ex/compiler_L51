@@ -1,13 +1,9 @@
 #pragma once
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <map>
 #include <set>
 #include <sstream>
-#include <unordered_map>
 #include <iomanip>
+#include "Lexical_Analyzer L51.h"
+#include "SA.h"
 
 using namespace std;
 
@@ -41,9 +37,8 @@ struct Production {
 	vector<string> symbols; // Правые части
 };
 
-
-
 class SP_Analyzer {
+	friend class Syntax_Analyzer;
 	set<string> nonterminals;
 	set<string> terminals;
 	string start_symbol;
@@ -53,15 +48,14 @@ class SP_Analyzer {
 	bool flag_SP;
 
 public:
-	
 	SP_Analyzer() : flag_SP(true) {}
 	bool isNonterminal(string);
 	void AddProduction(const string&, const vector<string>&);
 	void Transfer();
 	void PrintGrammar() const;
-	void LoadRules(ifstream &file);
-	const set<string> FIRST(string nonterminal);
-	const set<string> START(string nonterminal);
+	void LoadRules(ifstream& file);
+	const set<string> FIRST(string nonterminal, set<string>& visited);
+	const set<string> START(string nonterminal, set<string>& visited);
 	const set<string> END(string nonterminal, set<string>& visited);
 	//const set<string> END_Terminals(string nonterminal, set<string>& visited);
 	bool CheckGrammar();

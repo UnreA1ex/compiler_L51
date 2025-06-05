@@ -1,0 +1,53 @@
+/*
+	And now we'll check errors
+	with labels and variables
+								*/
+/* 
+	First label. She can have that
+	name, because it's first name in the programm
+													*/
+label1:
+
+
+/* Also I can "jump" to her. Like that: */
+
+jump label1;
+
+
+/* 
+	And now if I want to name some variable
+	with that name, I'll get an error
+										*/
+
+dim label1, label2;
+
+/* 
+	There I declared second label.
+	Also I can't name my label with "label2",
+	cause it's name of my second label
+										*/
+
+jump label2; label2:
+
+
+/*
+	Ok, let's check, what about keywords?
+											*/
+
+jump while; if: as: jump select; case:
+
+/* 
+	Yes. We've get an errors, because 
+	labels and variables can't be named with keywords
+														*/
+
+
+/* 
+	Let's check, what will show my program
+	if I'll name my variable that starts with a number?
+															*/
+
+dim 3x1, 3_qwe, 1dk, 10101binary;
+let 3x1 = 3 * 1; let 3_qwe = 3x1 + 3;
+
+/* And here too errors occur */

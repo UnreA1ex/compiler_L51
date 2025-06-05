@@ -1,0 +1,20 @@
+/*
+	Here're some operators
+							*/
+
+/* Uncorrect operators */							
+
+	++-
+		+=
+			-+
+				^^
+
+
+/* Correct operators */
+
+		/* Additive operators: */				+ -
+		/* Multiplicative operators: */			* / % & ^
+		/* First priority (main) operators: */  pow acs afm
+		/* Also assign operator: */				=
+
+/* Long incorrect operators: */			++-+-++ ++-><-++

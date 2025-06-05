@@ -1,0 +1,7 @@
+<tE> -> <tT><tE'> | <tT>
+<tE'> -> + <tT><tE'> | - <tT><tE'> | + <tT> | - <tT>
+<tT> -> <tF><tT'> | <tF>
+<tT'> -> * <tF><tT'> | / <tF><tT'> | % <tF><tT'> | * <tF> | / <tF> | % <tF>
+<tF> -> c | V | (<tE>) | pow(<tE>)
+<tF> -> m | afm( <tE> ) | acs( <tE><comma> <tE_bracket>
+<tE_bracket> -> <tE> )

@@ -1,0 +1,14 @@
+push 1
+pop x
+push x
+push 3
++
+pop n
+push n
+push 5
+>
+ji 12
+jmp 3
+push n
+write
+end

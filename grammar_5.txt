@@ -1,0 +1,61 @@
+S -> <prog>
+
+<announ> -> dim V as <type>; | dim V, <vl>
+<vl> -> V, <vl> | <vl'>
+<vl'> -> V as <type>;
+<type> -> int | multiset
+
+<prog> -> <op> <prog> | <op>
+
+<op> -> /* комментарий */
+<op> -> ;
+<op> -> L:
+<op> -> bad;
+
+<op> -> <announ>
+
+<op> -> <let>;
+<let> -> let V = <E>
+
+<test> -> (<E>R<E>)
+
+<op> -> <while> od;
+<while> -> while <test> do <prog>
+
+<op> -> <for_1> od;
+<for_1> -> <for_3> do <prog>
+<for_3> -> for V from <E> to <E> <step>
+<op> -> <for_2> od;
+<for_2> -> <for_4> do <prog>
+<for_4> -> for V from <E> to <E>
+
+<op> -> <if_1> fi;
+<op> -> <if_1> <else> fi;
+<if_1> -> if <test> <prog>
+<else> -> else <prog>
+
+<op> -> read V; | read V, <op_in>
+<op_in> -> V, <op_in> | <op_in'>;
+<op_in'> -> V
+
+<op> -> <write>;
+<write> -> write <op_out>
+<op_out> -> <E> <comma> <op_out> | <E>
+
+<op> -> jump L;
+
+<op> -> <select> <bran> ni ;
+<select> -> select <E> in
+<bran> -> <case> <bran'>
+<bran'> -> <case> <bran'> | <otherwise>
+<case> -> case C: <prog>
+<otherwise> -> otherwise <prog>
+
+<E> -> <T><E'> | <T>
+<E'> -> + <T><E'> | - <T><E'> | + <T> | - <T>
+<T> -> <F><T'> | <F>
+<T'> -> * <F><T'> | / <F><T'> | % <F><T'> | * <F> | / <F> | % <F>
+<F> -> c | v | (<E>) | pow(<E>)
+<F> -> m | afm(<E>) | acs(<E><comma> <E_bracket>
+<E_bracket> -> <E>)
+<comma> -> ,

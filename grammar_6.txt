@@ -1,0 +1,113 @@
+S -> <prog> | <announ><prog>
+<announ> -> <ann> <announ'>
+<announ'> -> <ann> <announ'>
+<ann> -> dim V as <type>; | dim V, <vl>
+<vl> -> V, <vl> | <vl'>
+<vl'> -> V as <type>;
+<type> -> int | multiset
+
+S -> <prog> | <announ><prog>
+<announ> -> <ann> <announ'>
+<announ'> -> <ann> <announ'>
+<ann> -> dim V as <type>; | dim V, <vl>
+<vl> -> V, <vl> | <vl'>
+<vl'> -> V as <type>;
+<type> -> int | multiset
+
+S -> <prog> | <announ><prog>
+<announ> -> <ann> <announ> | <ann>
+<ann> -> <vl> as <type>;
+<vl> -> dim V | <vl'> V
+<vl'> -> <vl>,
+<type> -> int | multiset
+
+S -> <prog> | <announ><prog>
+<announ> -> <announ> <ann>
+<announ> -> <ann>
+<ann> -> <vl> as <type>
+<vl> -> dim V
+<vl> -> <vl'> V
+<vl'> -> <vl>,
+<type> -> int | multiset
+
+
+<prog> -> <op> <prog> | <op>
+
+<op> -> /* комментарий */
+<op> -> ;
+<op> -> L:
+<op> -> bad;
+
+<op> -> <announ>
+
+<op> -> <let>;
+<let> -> let V = <E>
+
+<test> -> (<E>R<E>)
+
+<op> -> <while> od;
+<while> -> while <test> do <prog>
+
+<op> -> <for_1> od;
+<for_1> -> <for_3> do <prog>
+<for_3> -> for V from <E> to <E> <step>
+<op> -> <for_2> od;
+<for_2> -> <for_4> do <prog>
+<for_4> -> for V from <E> to <E>
+
+<op> -> <if_1> fi;
+<op> -> <if_1> <else> fi;
+<if_1> -> if <test> <prog>
+<else> -> else <prog>
+
+<op> -> read V; | read V, <op_in>
+<op_in> -> V, <op_in> | <op_in'>;
+<op_in'> -> V
+
+<op> -> write <E>; | write <E>, <op_out>
+<op_out> -> <E>, <op_out> | <op_out'>;
+<op_out'> -> <E>
+
+<op> -> jump L;
+
+<op> -> <select> <case_1> <o_wise> ni;
+<op> -> <select> <case_1> ni;
+<select> -> select <E> in
+<case_1> -> <case> <case_1> | <case>
+<case> -> case C: <prog>
+<o_wise> -> otherwise <prog>
+
+<E> -> <T><E'> | <T>
+<E'> -> + <T><E'> | - <T><E'> | + <T> | - <T>
+<T> -> <F><T'> | <F>
+<T'> -> * <F><T'> | / <F><T'> | % <F><T'> | * <F> | / <F> | % <F>
+<F> -> c | v | (<E>) | pow(<E>)
+<F> -> m | afm(<E>) | acs(<E>, <E>)
+
+
+
+
+<op> -> <select> <case_1> <o_wise> ni;
+<op> -> <select> <case_1> ni;
+<select> -> select <E> in
+<case> -> 
+<case> -> case C: <prog>
+<o_wise> -> otherwise <prog>
+
+<op> -> <select_1> ni;
+<op> -> <select_1> <o_wise> ni;
+<select_1> -> select <E> in case C: <prog>
+<op> -> <select> <case_1> ni;
+<select> -> select <E> in
+<case_1> -> <case> <case_1> | <case>
+<case> -> case C: <prog>
+<o_wise> -> otherwise <prog>
+
+
+
+<op> -> select <E> in <case>
+<case> -> <case_1> <o_wise> ni; | <case_1> ni; | <case_2> <o_wise> ni; | <case_2> ni;
+<case_1> -> case C: <prog>
+<case_2> -> <case_1> <cases>
+<cases> -> <case_1> <cases> | <case_1>
+<o_wise> -> otherwise <prog>

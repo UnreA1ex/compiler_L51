@@ -1,0 +1,50 @@
+ad:
+/* Example with variable declaring */
+dim _x as int;
+dim m1, m2, m3 as multiset;
+
+
+/* That's initialisation */
+let _x = 0;
+let x1 = 1;
+let x2 = x;
+let x3 = _x;
+let m1 = $1, 2, 2,   4,3, 87, 0$;
+
+/* Input operator */
+read x_, y;
+
+while_:
+/* While and for */
+while _x < 10 do
+	let _x = _x + 1; 
+od;
+for x3 from pow($1, 2, 2$ + $1$) to pow(m1) by 2 do
+	afm(m1); 
+od;
+
+lab1:
+
+/* Output operator */
+write _x, x_; write m1;
+
+/* That's a label */
+jump while_;
+
+/* Now we check correction of select-case */
+
+select y in 
+	case 1: 
+		let x3 = x3 + 1;
+	case 2:
+		let x3 = x3 + 2;
+	case 3:
+		let x3 = x3 + 3;
+	otherwise bad;
+ni;
+
+/* That's all operators in my program! */
+
+/* Oh, that's empty operator */
+;
+/* Forgot about it... */

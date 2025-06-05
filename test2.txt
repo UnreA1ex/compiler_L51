@@ -1,0 +1,5 @@
+/* Now we'll check uncorrect symbols */
+/* Ready for many error lines... */
+
+@ ! # $ % ^ & * () _ - + = ] [ \ | /
+? "" { } ' ~ `
