@@ -100,6 +100,9 @@
     <Text Include="test7.txt">
       <Filter>Файлы ресурсов\test_progs</Filter>
     </Text>
+    <Text Include="atr_gram.txt">
+      <Filter>Файлы ресурсов\grammars</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\class_multiset\input1">
