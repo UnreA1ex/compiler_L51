@@ -34,29 +34,29 @@ using namespace std;
 //};
 
 struct Production {
-	vector<withAtr> symbols; // Правые части
+	vector<string> symbols; // Правые части
 };
 
 class SP_Analyzer {
 	friend class Syntax_Analyzer;
-	set<withAtr> nonterminals;
-	set<withAtr> terminals;
-	withAtr start_symbol;
-	map<withAtr, vector<Production>> productions;  // Каждому нетерминалу свои правые части из структуры "Production"
+	set<string> nonterminals;
+	set<string> terminals;
+	string start_symbol;
+	map<string, vector<Production>> productions;  // Каждому нетерминалу свои правые части из структуры "Production"
 	unordered_map<string, unordered_map<string, char>> precedence_table;
 	ofstream table;
 	bool flag_SP;
 
 public:
 	SP_Analyzer() : flag_SP(true) {}
-	bool isNonterminal(withAtr);
-	void AddProduction(const withAtr&, const vector<withAtr>&);
+	bool isNonterminal(string);
+	void AddProduction(const string&, const vector<string>&);
 	void Transfer();
 	void PrintGrammar() const;
 	void LoadRules(ifstream& file);
-	const set<withAtr> FIRST(withAtr nonterminal, set<withAtr>& visited);
-	const set<withAtr> START(withAtr nonterminal, set<withAtr>& visited);
-	const set<withAtr> END(withAtr nonterminal, set<withAtr>& visited);
+	const set<string> FIRST(string nonterminal, set<string>& visited);
+	const set<string> START(string nonterminal, set<string>& visited);
+	const set<string> END(string nonterminal, set<string>& visited);
 	//const set<string> END_Terminals(string nonterminal, set<string>& visited);
 	bool CheckGrammar();
 	void ifUseless();

@@ -146,9 +146,9 @@ class Tokenizer {
 
     void Read_Separator();
 
-    bool isErrors();
-
 public:
+
+    bool isErrors();
 
     vector<int> error_lines;
 

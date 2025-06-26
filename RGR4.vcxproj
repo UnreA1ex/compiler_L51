@@ -148,6 +148,7 @@
     <Text Include="..\class_multiset\grammar_6.txt" />
     <Text Include="..\class_multiset\grammar_7.txt" />
     <Text Include="atr_gram.txt" />
+    <Text Include="atr_gram2.txt" />
     <Text Include="grammar.txt" />
     <Text Include="grammar_8.txt" />
     <Text Include="test1.txt" />

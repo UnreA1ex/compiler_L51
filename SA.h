@@ -13,11 +13,21 @@ struct ParseTreeNode {
 	ParseTreeNode(const std::string& t, const tuple<SymbolicTokenClass, TokenValue, int>& tok) : type(t), token(tok) {}
 };
 
+struct vartype {
+	string var;
+	string type;
+};
+
+struct withAtr {
+	string symbol;
+	vector<string> atrs;
+};
+
 string TokenToString(tuple<SymbolicTokenClass, TokenValue, int> token);
 
 class Syntax_Analyzer : protected Tokenizer {
-	vector<string> magazine;
-	vector<map<string, vector<string>>> history;
+	vector<withAtr> magazine;
+	vector<map<string, vector<withAtr>>> history;
 	stack<ParseTreeNode*> parse_stack;
 	unordered_map<string, string> labelMap;
 	int labelCounter = 0;
@@ -28,14 +38,17 @@ public:
 
 	void Parse(string filename_P, ifstream& file_G);
 	void ShowHistory();
-	void PrintTree(ParseTreeNode*, int);
+	/*void PrintTree(ParseTreeNode*, int);
 	void CollectIdentifiers(ParseTreeNode* node, vector<string>& vars);
 	void GenerateCodeAsData(ParseTreeNode* node);
 	void GenerateCode(ParseTreeNode* node);
-	void ReportUnusedLabels();
+	void ReportUnusedLabels();*/
+	void ShowProgram();
 	int label_counter = 0; // для генерации уникальных меток
 
 	string newLabel() {
-		return "L" + to_string(label_counter++);
+		return to_string(label_counter++);
 	}
+
+	string OTR(string R);
 };

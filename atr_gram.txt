@@ -1,67 +1,417 @@
-S -> <prog>
+S.{atr1} -> <prog>.{atr1_}
+	atr1 <- atr1_
 
-<announ> -> <vl> as <type> ;
-<vl> -> dim V | <vl'> V
-<vl'> -> <vl>,
-<type> -> int | multiset
+<announ>.{atr1} -> <vl>.{atr1_} as <type>.{atr1'} ;
+	Всем переменным из atr1_ установить тип atr1';
 
-<prog> -> <op> <prog> | <op>
+<vl>.{atr1} -> dim V.{atr1_, atr2_}
+	atr1 <- atr1_
 
-<op> -> /* комментарий */
-<op> -> ;
-<op> -> L :
-<op> -> bad ;
+<vl>.{atr1} -> <vl'>.{atr1_} V.{atr1', atr2'}
+	atr1 <- atr1_, atr1' (добавить atr1' в списпок atr1_)
 
-<op> -> <announ>
+<vl'>.{atr1} -> <vl>.{atr1_},
+	atr1 <- atr1_
 
-<op> -> <let> ;
-<let> -> let V = <E>
+<type>.{atr1} -> int.{atr1_}
+	atr1 <- atr1_
 
-<test_if> -> ( <E> R <E> )
-<test_w> -> <E> R <E>
+<type>.{atr1} -> multiset.{atr1_}
+	atr1 <- atr1_
 
-<op> -> <while> od ;
-<while> -> while <test_w> do <prog>
+<prog>.{atr1} -> <op>.{atr1_} <prog>.{atr1'}
+	atr1 <- atr1_, atr1'
 
-<op> -> <for_1> od ;
-<for_1> -> <for_3> do <prog>
-<for_3> -> for V from <E> to <E> <step>
-<step> -> by <E>
-<op> -> <for_2> od ;
-<for_2> -> <for_4> do <prog>
-<for_4> -> for V from <E> to <E>
+<prog>.{atr1} -> <op>.{atr1_}
+	atr1 <- atr1_
 
-<op> -> <if_1> fi ;
-<op> -> <if_1> <else> fi ;
-<if_1> -> if <test_if> <prog>
-<else> -> else <prog>
+<op>.{atr1} -> /* комментарий */
+	atr1 <- *пустая программа*
 
-<op> -> <read> ;
-<read> -> read V | <op_in> V
-<op_in> -> <read>,
+<op>.{atr1} -> ;
+	atr1 <- *пустая программа*
 
-<op> -> <write>;
-<write> -> write <op_out>
-<op_out> -> <E> <comma> <op_out> | <E>
+<op>.{atr1} -> L :
+	r <- НОВМЕТКА
+	atr1 <- label r
 
-<op> -> jump <label> ;
-<label> -> L
+<op>.{atr1} -> bad ;
+	atr1 <- end
 
-<op> -> <select> <bran> ni ;
-<select> -> select <E> in
-<bran> -> <bran'>
-<bran'> -> <case> <bran'> | <otherwise>
-<case> -> case C <colon> <prog>
+<op>.{atr1} -> <announ>.{atr1_}
+	atr1 <- atr1_
+
+<op>.{atr1} -> <let>.{atr1_} ;
+	atr1 <- atr1_
+
+<let>.{atr1} -> let V.{atr1_, atr2_} = <E>.{atr1', atr2'}
+	Если
+		atr2_ и atr2' - int,
+	то 
+		atr1 <- atr1', pop atr1_
+	иначе
+		если
+			atr2_ и atr2' - multiset
+		то
+			atr1 <- atr1', pop atr1_
+		иначе
+			ошибка: Несоответствие типов в присваивании
+
+<test_if>.{atr1} -> ( <E>.{atr1_, atr2_} R <E>.{atr1', atr2'} )
+	Если atr2_ != atr2', то ошибка: Несоответствие типов в выражении
+	ОТР(R) - отрицание R
+	atr1 <- atr1_, atr1', ОТР(R)
+
+<test_w>.{atr1} -> <E>.{atr1_, atr2_} R <E>.{atr1', atr2'}
+	Если atr2_ != atr2', то ошибка: Несоответствие типов в выражении
+	ОТР(R) - отрицание R
+	atr1 <- atr1_, atr1', ОТР(R)
+
+<op>.{atr1} -> <while>.{atr1_} od ;
+	atr1 <- atr1_
+
+<while>.{atr1} -> while <test_w>.{atr1_} do <prog>.{atr1'}
+	m1 <- НОВМЕТКА
+	m2 <- НОВМЕТКА
+	atr1 <-	
+			label m1
+			atr1_
+			ji m2
+			atr1'
+			jmp m1
+			label m2
+
+<op>.{atr1} -> <for_1>.{atr1_} od ;
+	atr1 <- atr1_
+
+<for_1>.{atr1} -> <for_3>.{atr1_, atr2_, atr3_, atr4_} do <prog>.{atr1'}
+	m1 <- НОВМЕТКА
+	m2 <- НОВМЕТКА
+	atr1 <- 
+			atr2_
+			pop atr1_
+			label m1
+			push atr1_
+			atr3_
+			>
+			ji m2
+			atr1'
+			push atr1_
+			atr4_
+			+
+			pop atr1_
+			jmp m1
+			label m2
+
+<for_3>.{atr1, atr2, atr3, atr4} -> for V.{atr1_, atr2_} from <E>.{atr1', atr2'} to <E>.{atr1_', atr2_'} <step>.{atr1'_}
+	Если atr2_ != int ИЛИ atr2' != int ИЛИ atr2_' != int
+	то ошибка: невозможна итерация по multiset
+	atr1 <- atr1_
+	atr2 <- atr1'
+	atr3 <- atr1_'
+	atr4 <- atr1'_
+
+<step>.{atr1} -> by <E>.{atr1_, atr2_}
+	Если atr2_ != int, то ошибка: невозможна итерация по multiset
+	atr1 <- atr1_
+
+<op>.{atr1} -> <for_2>.{atr1_} od ;
+	atr1 <- atr1_
+
+<for_2>.{atr1} -> <for_4>.{atr1_, atr2_, atr3_} do <prog>.{atr1'}
+	m1 <- НОВМЕТКА
+	m2 <- НОВМЕТКА
+	atr1 <- 
+			atr2_
+			pop atr1_
+			label m1
+			push atr1_
+			atr3_
+			>
+			ji m2
+			atr1'
+			push atr1_
+			push 1
+			+
+			pop atr1_
+			jmp m1
+			label m2
+			
+<for_4>.{atr1, atr2, atr3} -> for V.{atr1_, atr2_} from <E>.{atr1', atr2'} to <E>.{atr1_', atr2_'}
+	Если atr2_ != int ИЛИ atr2' != int ИЛИ atr2_' != int
+	то ошибка: невозможна итерация по multiset
+	atr1 <- atr1_
+	atr2 <- atr1'
+	atr3 <- atr1_'
+
+
+
+<op>.{atr1} -> <if_1>.{atr1_, atr2_} fi ;
+	m <- НОВМЕТКА
+	atr1 <- 
+			atr1_
+			ji m
+			atr2_
+			label m
+
+<op>.{atr1} -> <if_1>.{atr1_, atr2_} <else>.{atr1'} fi ;
+	m1 <- НОВМЕТКА
+	m2 <- НОВМЕТКА
+	atr1 <-
+			atr1_
+			ji m1
+			atr2_
+			jmp m2
+			label m1
+			atr1'
+			label m2
+
+<if_1>.{atr1, atr2} -> if <test_if>.{atr1_} <prog>.{atr1'}
+	atr1 <- atr1_
+	atr2 <- atr1'
+			
+
+<else>.{atr1} -> else <prog>.{atr1_}
+	atr1 <- atr1_
+
+<op>.{atr1} -> <read>.{atr1_} ;
+	atr1 <- atr1_
+
+<read>.{atr1} -> read V.{atr1_, atr2_}
+	atr1 <-
+			read
+			pop atr1_
+
+<read>.{atr1} -> <op_in>.{atr1_} V.{atr1', atr2'}
+	atr1 <- 
+			atr1_
+			read
+			pop atr1'
+
+<op_in>.{atr1} -> <read>.{atr1_},
+	atr1 <- atr1_
+
+<op>.{atr1} -> <write>.{atr1_};
+	atr1 <- atr1_
+
+<write>.{atr1} -> write <op_out>.{atr1_}
+	atr1 <- atr1_
+
+<op_out>.{atr1} -> <E>.{atr1_, atr2_} <comma> <op_out>.{atr1'}
+	atr1 <-
+			atr1_
+			write
+			atr1'
+
+<op_out>.{atr1} -> <E>.{atr1_, atr2_}
+	atr1 <- 
+			atr1_
+			write
+
+<op>.{atr1} -> jump <label>.{atr1_} ;
+	atr1 <- atr1_
+
+<label>.{atr1} -> L
+	r <- НОВМЕТКА
+	atr1 <- label r
+
+<op>.{atr1} -> <select>.{atr1_} <bran>.{atr1', atr2', atr3', atr4'} ni ;
+	r <- НОВМЕТКА
+	Пусть atr2' = (y_1, ..., y_n, y_n+1), y_n+1 может не быть   ЭТО СПИСОК МЕТОК
+	atr3' = (z_1, ..., z_n)										ЭТО СПИСОК КОНСТАНТ
+	
+		 { y_n+1, если есть
+	r' =
+         { atr4' иначе
+
+	atr1 <-
+			atr1_
+			pop r
+			
+			push z_1
+			push r
+			=
+			ji y_1
+			...
+			push z_n
+			push r
+			=
+			ji y_n
+
+			jmp r'
+			atr1'
+
+
+<select>.{atr1} -> select <E>.{atr1_, atr2_} in
+	Если atr2_ != int,
+	то ошибка: требуется целое число
+	atr1 <- atr1_
+
+<bran>.{atr1, atr2, atr3, atr4} -> <bran'>.{atr1_, atr2_, atr3_, atr4_}
+	atr1 <- atr1_
+	atr2 <- atr2_
+	atr3 <- atr3_
+	atr4 <- atr4_
+
+<bran'>.{atr1, atr2, atr3, atr4} -> <case>.{atr1_, atr2_, atr3_} <bran'>.{atr1', atr2', atr3', atr4'}
+	r <- НОВМЕТКА
+	atr4 <- atr4'
+	atr2 <- r, atr2' (конкатенация в списке)
+	atr3 <- atr3_, atr3' (same)
+	atr1 <- atr1_, jmp atr4', atr1'
+
+<bran'>.{atr1, atr2, atr3, atr4} -> <otherwise>.{atr1_, atr2_, atr3_, atr4_}
+	atr1 <- atr1_
+	atr2 <- atr2_
+	atr3 <- atr3_
+	atr4 <- atr4_
+
+<bran'>.{atr1, atr2, atr3, atr4} -> <case>.{atr1_, atr2_, atr3_}
+	atr4 <- НОВМЕТКА
+	atr1 <- atr1_, label atr4
+	atr2 <- atr2_
+	atr3 <- atr3_
+
+<case>.{atr1, atr2, atr3} -> case C.{atr1_} <colon> <prog>.{atr1'}
+	r <- НОВМЕТКА
+	atr2 <- label r
+	atr3 <- atr1_
+	atr1 <- label r, atr1'
+
+<otherwise>.{atr1, atr2, atr3, atr4} -> otherwise <prog>.{atr1_}
+	r <- НОВМЕТКА
+	atr4 <- НОВМЕТКА
+	atr2 <- r
+	atr3 <- *пусто*
+	atr1 <- label r, atr1_, label atr4
+
 <colon> -> :
-<otherwise> -> otherwise <prog>
 
-<op> -> afm ( <E> )
+<op>.{atr1, atr2} -> afm ( <E>.{atr1_, atr2_} )
+	Если 
+		atr2_ не является multiset
+	то 
+		ошибка: "Неверный тип аргумента при вызове функции"
+	иначе
+	atr1 <- atr1_, afm
 
-<E> -> <T>_r <E'> | <T>
-<E'> -> + <T><E'> | - <T><E'> | + <T> | - <T>
-<T> -> <F><T'> | <F>
-<T'> -> * <F><T'> | / <F><T'> | % <F><T'> | * <F> | / <F> | % <F>
-<F> -> C | V | ( <E> ) | pow ( <E> )
-<F> -> m | acs ( <E><comma> <E_bracket>
-<E_bracket> -> <E> )
+<E>.{atr1, atr2} -> <T>.{atr1_, atr2_} <E'>.{atr1', atr2'}
+	Если atr2_ != atr2', то ошибка: несоответствие типов в выражении
+	atr1 <- atr1_, atr1'
+	atr2 <- atr2_
+
+<E>.{atr1, atr2} -> <T>.{atr1_, atr2_}
+	atr1 <- atr1_
+	atr2 <- atr2_	
+
+<E'>.{atr1, atr2} -> + <T>.{atr1_, atr2_} <E'>.{atr1', atr2'}
+	Если atr2_ != atr2', то ошибка: несоответствие типов в выражении
+	atr1 <- atr1_, +, atr1'
+	atr2 <- atr2_
+
+<E'>.{atr1, atr2} -> ^ <T>.{atr1_, atr2_} <E'>.{atr1', atr2'}
+	Если atr2_ != atr2', то ошибка: несоответствие типов в выражении
+	atr1 <- atr1_, ^, atr1'
+	atr2 <- atr2_
+
+<E'>.{atr1, atr2} -> - <T>.{atr1_, atr2_} <E'>.{atr1', atr2'}
+	Если atr2_ != atr2', то ошибка: несоответствие типов в выражении
+	atr1 <- atr1_, -, atr1'
+	atr2 <- atr2_
+
+<E'>.{atr1, atr2} -> + <T>.{atr1_, atr2_}
+	atr1 <- atr1_
+	atr2 <- atr2_
+
+<E'>.{atr1, atr2} -> ^ <T>.{atr1_, atr2_}
+	atr1 <- atr1_
+	atr2 <- atr2_	
+
+<E'>.{atr1, atr2} -> - <T>.{atr1_, atr2_}
+	atr1 <- atr1_
+	atr2 <- atr2_	
+
+<T>.{atr1, atr2} -> <F>.{atr1_, atr2_} <T'>.{atr1', atr2'}
+	Если atr2_ != atr2', то ошибка: несоответствие типов в выражении
+	atr1 <- atr1_, atr1'
+	atr2 <- atr2_
+
+<T>.{atr1, atr2} -> <F>.{atr1_, atr2_}
+	atr1 <- atr1_
+	atr2 <- atr2_
+
+<T'>.{atr1, atr2} -> * <F>.{atr1_, atr2_} <T'>.{atr1', atr2'}
+	Если atr2_ != atr2', то ошибка: несоответствие типов в выражении
+	atr1 <- atr1_, *, atr1'
+	atr2 <- atr2_
+
+<T'>.{atr1, atr2} -> / <F>.{atr1_, atr2_} <T'>.{atr1', atr2'}
+	Если atr2_ != atr2', то ошибка: несоответствие типов в выражении
+	atr1 <- atr1_, /, atr1'
+	atr2 <- atr2_
+
+<T'>.{atr1, atr2} -> % <F>.{atr1_, atr2_} <T'>.{atr1', atr2'}
+	Если atr2_ != atr2', то ошибка: несоответствие типов в выражении
+	atr1 <- atr1_, %, atr1'
+	atr2 <- atr2_
+
+<T'>.{atr1, atr2} -> & <F>.{atr1_, atr2_} <T'>.{atr1', atr2'}
+	Если atr2_ != atr2', то ошибка: несоответствие типов в выражении
+	atr1 <- atr1_, &, atr1'
+	atr2 <- atr2_
+
+<T'>.{atr1, atr2} -> * <F>.{atr1_, atr2_}
+	atr1 <- atr1_, *
+	atr2 <- atr2_
+
+<T'>.{atr1, atr2} -> / <F>.{atr1_, atr2_}
+	atr1 <- atr1_, /
+	atr2 <- atr2_
+
+<T'>.{atr1, atr2} -> % <F>.{atr1_, atr2_}
+	atr1 <- atr1_, %
+	atr2 <- atr2_
+
+<T'>.{atr1, atr2} -> & <F>.{atr1_, atr2_}
+	atr1 <- atr1_, &
+	atr2 <- atr2_
+
+<F>.{atr1, atr2} -> C.{atr1_, atr2_} 
+	atr1 <- push{atr1_}
+	atr2 <- atr2_
+
+<F>.{atr1, atr2} -> V.{atr1_, atr2_}
+	atr1 <- push{atr1_}
+	atr2 <- atr2_
+
+<F>.{atr1, atr2} -> ( <E>.{atr1_, atr2_}  )
+	atr1 <- atr1_
+	atr2 <- atr2_
+
+<F>.{atr1, atr2} -> pow ( <E>.{atr1_, atr2_} )
+	Если 
+		atr2_ не является multiset
+	то 
+		ошибка: "Неверный тип аргумента при вызове функции"
+	иначе
+		atr1 <- atr1_, pow
+		atr2 <- int
+
+<F>.{atr1, atr2} -> m.{atr1, atr2}
+	atr1 <- push{atr1_}
+	atr2 <- atr2_
+
+<F>.{atr1, atr2} -> acs ( <E>.{atr1_, atr2_} <comma> <E_bracket>.{atr1', atr2'}
+	Если 
+		(atr2_ не является multiset) ИЛИ (atr2' не является int)
+	то 
+		ошибка: "Неверные типы аргументов при вызове функции"
+	иначе
+		atr1 <- atr1_, atr1', acs
+		atr2 <- int
+
+<E_bracket>.{atr1, atr2} -> <E>{atr1_, atr2_} )
+	atr1 <- atr1_
+	atr2 <- atr2_
+
 <comma> -> ,

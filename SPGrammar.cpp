@@ -1,18 +1,18 @@
 #include "SPGrammar.h"
 
-bool isInSet(const withAtr& element, const set<withAtr>& my_set) {
+bool isInSet(const string& element, const set<string>& my_set) {
 	return my_set.count(element);
 }
 
-bool SP_Analyzer::isNonterminal(withAtr s) {
+bool SP_Analyzer::isNonterminal(string s) {
 	return isInSet(s, nonterminals);
 }
 
-void SP_Analyzer::AddProduction(const withAtr& lhs, const vector<withAtr>& rhs) {
+void SP_Analyzer::AddProduction(const string& lhs, const vector<string>& rhs) {
 	nonterminals.insert(lhs);
 	productions[lhs].push_back({ rhs }); // {rhs} - uniform initialization для структур в полем вектора
-	for (const withAtr& sym : rhs) {
-		if (sym.symbol != "eps")
+	for (const string& sym : rhs) {
+		if (sym != "eps")
 			terminals.insert(sym);
 		else {
 			cout << "Имеется eps-правило" << endl;
@@ -28,20 +28,20 @@ void SP_Analyzer::Transfer() {
 }
 
 void SP_Analyzer::PrintGrammar() const {
-	cout << "Начальный нетерминал: " << start_symbol.symbol << "\n\nПравила:\n";
+	cout << "Начальный нетерминал: " << start_symbol << "\n\nПравила:\n";
 	for (const auto& [lhs, rules] : productions) {
 		for (const auto& prod : rules) {
-			cout << lhs.symbol << " -> ";
+			cout << lhs << " -> ";
 			for (const auto& syms : prod.symbols) {
-				cout << syms.symbol << ' ';
+				cout << syms << ' ';
 			}
 			cout << '\n';
 		}
 	}
 	cout << "\nНетерминалы: ";
-	for (const auto& nt : nonterminals) cout << nt.symbol << " ";
+	for (const auto& nt : nonterminals) cout << nt << " ";
 	cout << "\nТерминалы: ";
-	for (const auto& t : terminals) cout << t.symbol << " ";
+	for (const auto& t : terminals) cout << t << " ";
 	cout << endl;
 }
 
@@ -128,205 +128,12 @@ void SP_Analyzer::PrintGrammar() const {
 //}
 
 
-//void SP_Analyzer::LoadRules(ifstream& file) {
-//	string line;
-//	while (getline(file, line)) {
-//		if (line.empty()) continue;
-//
-//		size_t pos_arr = line.find("->");  // Найти позицию стрелочки
-//		size_t pos_dot = line.find(".");  // Найти позицию точки
-//		/*for (int i = 0; i < line.size(); i++) {
-//			if (i < pos) {
-//				if (i == 0) {
-//					if (line[i] == 'S') {
-//						lhs = line[i];
-//					}
-//					else {
-//						continue;
-//					}
-//				}
-//				while (line[i] != '>')
-//					lhs += line[i];
-//			}
-//			else {
-//				i +=
-//			}
-//		}*/
-//		withAtr lhs;
-//		lhs.symbol = line.substr(0, pos_dot - 1);
-//		string atr = "";
-//		for (int i = pos_dot + 1; i < pos_arr; i++) {
-//			if ((line[i] == '(') || (line[i] == ')') || (line[i] == ' '))
-//				continue;
-//			if (line[i] == ',') {
-//				if (atr.size() > 0)
-//					lhs.atrs.push_back(atr);
-//			}
-//			atr += line[i];
-//		}
-//		/*
-//		bool flag_atr = false;
-//		for (int i = pos_arr + 1; i < line.size(); i++) {
-//			if (line[i] == '.') {
-//				if (!flag_atr)
-//					flag_atr = true;
-//				else
-//					cout << "Ошибка чтения атрибута. Встречено две точки" << endl;
-//			}
-//			if ((line[i] == '(') || (line[i] == ')') || (line[i] == ' '))
-//				continue;
-//		}
-//		line.substr(pos + 2);*/
-//		string str;
-//		stringstream ss(str);
-//		string token;
-//		vector<withAtr> current;
-//
-//		while (ss >> token) {
-//			size_t pos_1 = token.find(',');
-//			if (token == "(") {
-//				withAtr temp;
-//				temp.symbol = "(";
-//				current.push_back(temp);
-//				continue;
-//			}
-//			if (token == ")") {
-//				withAtr temp;
-//				temp.symbol = ")";
-//				current.push_back(temp);
-//				continue;
-//			}
-//			if (token == "L:") {
-//				withAtr temp;
-//				temp.symbol = "L";
-//				current.push_back(temp);
-//				temp.symbol = ":";
-//				current.push_back(temp);
-//				continue;
-//			}
-//			if (token == ",") {
-//				withAtr temp;
-//				temp.symbol = ",";
-//				current.push_back(temp);
-//				continue;
-//			}
-//			if (pos_1 != string::npos) {
-//				withAtr temp;
-//				temp.symbol = token.substr(0, pos_1);
-//				current.push_back(temp);
-//				temp.symbol = token.substr(pos_1);
-//				current.push_back(temp);
-//				continue;
-//			}
-//			if (token == "/*") {
-//				string s1;
-//				string s2;
-//				ss >> s1 >> s2;
-//				token += s1 + s2;
-//			}
-//			if (token == "|") {
-//				AddProduction(lhs, current);
-//				current.clear();
-//			}
-//			else {
-//				size_t position = token.find('(');
-//				size_t position_1 = token.find('>');
-//				size_t pos_dot = line.find(".");  // Найти позицию точки
-//				if (position_1 != string::npos && position != string::npos) {
-//					if (pos_dot != string::npos) {
-//						bool flag = false;
-//						string cur = "";
-//						for (int i = 0; i < token.size(); i++) {
-//							if (token[i] == '(') {
-//								if (!cur.empty()) {
-//									current.push_back(cur);
-//									cur = "";
-//								}
-//								current.push_back(string(1, '('));
-//								i++;
-//							}
-//							if (token[i] == '<') {
-//								flag = true;
-//								if (!cur.empty()) {
-//									current.push_back(cur);
-//									cur = "";
-//								}
-//							}
-//							cur += token[i];
-//							if (token[i] == '>') {
-//								flag = false;
-//								current.push_back(cur);
-//								cur = "";
-//							}
-//						}
-//						if (!cur.empty()) {
-//							current.push_back(cur);
-//						}
-//					}
-//					else {
-//						cout << "У терминала " << token << " нет атрибутов" << endl;
-//					}
-//				}
-//				else {
-//					if (position != string::npos) {
-//						string cur = "";
-//						for (int i = 0; i < token.size(); i++) {
-//							if (token[i] == '(') {
-//								current.push_back(string(1, '('));
-//								i++;
-//							}
-//							cur += token[i];
-//						}
-//						if (cur.size() > 0) {
-//							current.push_back(cur);
-//						}
-//					}
-//					else if (position_1 != string::npos) {
-//						bool flag = false;
-//						string cur = "";
-//						for (int i = 0; i < token.size(); i++) {
-//							if (token[i] == '<') {
-//								flag = true;
-//								if (!cur.empty()) {
-//									current.push_back(cur);
-//									cur = "";
-//								}
-//							}
-//							cur += token[i];
-//							if (token[i] == '>') {
-//								flag = false;
-//								current.push_back(cur);
-//								cur = "";
-//							}
-//						}
-//						if (!cur.empty()) {
-//							current.push_back(cur);
-//						}
-//					}
-//					else
-//						current.push_back(token);
-//				}
-//			}
-//		}
-//
-//		if (!current.empty()) AddProduction(lhs, current);
-//
-//		if (start_symbol.empty())
-//			start_symbol = lhs;
-//	}
-//
-//	ifUseless();
-//	Transfer();
-//	ifLRecursion();
-//}
-
 void SP_Analyzer::LoadRules(ifstream& file) {
 	string line;
 	while (getline(file, line)) {
 		if (line.empty()) continue;
 
-		size_t pos_arr = line.find("->");  // Найти позицию стрелочки
-		size_t pos_dot = line.find(".");  // Найти позицию точки
+		size_t pos = line.find("->");  // Найти позицию стрелочки
 		/*for (int i = 0; i < line.size(); i++) {
 			if (i < pos) {
 				if (i == 0) {
@@ -344,74 +151,35 @@ void SP_Analyzer::LoadRules(ifstream& file) {
 				i +=
 			}
 		}*/
-		withAtr lhs;
-		lhs.symbol = line.substr(0, pos_dot - 1);
-		string atr = "";
-		for (int i = pos_dot + 1; i < pos_arr; i++) {
-			if ((line[i] == '(') || (line[i] == ')') || (line[i] == ' '))
-				continue;
-			if (line[i] == ',') {
-				if (atr.size() > 0) {
-					lhs.atrs.push_back(atr);
-					atr = "";
-				}
-			}
-			atr += line[i];
-		}
-		if (atr.size() > 0)
-			lhs.atrs.push_back(atr);
-		/*
-		bool flag_atr = false;
-		for (int i = pos_arr + 1; i < line.size(); i++) {
-			if (line[i] == '.') {
-				if (!flag_atr)
-					flag_atr = true;
-				else
-					cout << "Ошибка чтения атрибута. Встречено две точки" << endl;
-			}
-			if ((line[i] == '(') || (line[i] == ')') || (line[i] == ' '))
-				continue;
-		}
-		line.substr(pos + 2);*/
-		string str;
-		stringstream ss(str);
+		string lhs = line.substr(0, pos - 1);
+		string rhs = line.substr(pos + 2);
+
+		stringstream ss(rhs);
 		string token;
-		vector<withAtr> current;
+		vector<string> current;
 
 		while (ss >> token) {
 			size_t pos_1 = token.find(',');
 			if (token == "(") {
-				withAtr temp;
-				temp.symbol = "(";
-				current.push_back(temp);
+				current.push_back(token);
 				continue;
 			}
 			if (token == ")") {
-				withAtr temp;
-				temp.symbol = ")";
-				current.push_back(temp);
+				current.push_back(token);
 				continue;
 			}
 			if (token == "L:") {
-				withAtr temp;
-				temp.symbol = "L";
-				current.push_back(temp);
-				temp.symbol = ":";
-				current.push_back(temp);
+				current.push_back("L");
+				current.push_back(":");
 				continue;
 			}
 			if (token == ",") {
-				withAtr temp;
-				temp.symbol = ",";
-				current.push_back(temp);
+				current.push_back(token);
 				continue;
 			}
 			if (pos_1 != string::npos) {
-				withAtr temp;
-				temp.symbol = token.substr(0, pos_1);
-				current.push_back(temp);
-				temp.symbol = token.substr(pos_1);
-				current.push_back(temp);
+				current.push_back(token.substr(0, pos_1));
+				current.push_back(token.substr(pos_1));
 				continue;
 			}
 			if (token == "/*") {
@@ -425,37 +193,83 @@ void SP_Analyzer::LoadRules(ifstream& file) {
 				current.clear();
 			}
 			else {
-				withAtr _token_;
-				size_t pos_dot = line.find(".");  // Найти позицию точки
-				if (pos_dot != string::npos) {
-					_token_.symbol = line.substr(0, pos_dot - 1);
-					string atr = "";
-					for (int i = pos_dot + 1; i < token.size(); i++) {
-						if ((line[i] == '(') || (line[i] == ')') || (line[i] == ' '))
-							continue;
-						if (line[i] == ',') {
-							if (atr.size() > 0) {
-								_token_.atrs.push_back(atr);
-								atr = "";
+				size_t position = token.find('(');
+				size_t position_1 = token.find('>');
+				if (position_1 != string::npos && position != string::npos) {
+					bool flag = false;
+					string cur = "";
+					for (int i = 0; i < token.size(); i++) {
+						if (token[i] == '(') {
+							if (!cur.empty()) {
+								current.push_back(cur);
+								cur = "";
+							}
+							current.push_back(string(1, '('));
+							i++;
+						}
+						if (token[i] == '<') {
+							flag = true;
+							if (!cur.empty()) {
+								current.push_back(cur);
+								cur = "";
 							}
 						}
-						atr += line[i];
+						cur += token[i];
+						if (token[i] == '>') {
+							flag = false;
+							current.push_back(cur);
+							cur = "";
+						}
 					}
-					if (atr.size() > 0) {
-						_token_.atrs.push_back(atr);
+					if (!cur.empty()) {
+						current.push_back(cur);
 					}
 				}
 				else {
-					cout << "У терминала " << token << " нет атрибутов" << endl;
-					_token_.symbol = token;
+					if (position != string::npos) {
+						string cur = "";
+						for (int i = 0; i < token.size(); i++) {
+							if (token[i] == '(') {
+								current.push_back(string(1, '('));
+								i++;
+							}
+							cur += token[i];
+						}
+						if (cur.size() > 0) {
+							current.push_back(cur);
+						}
+					}
+					else if (position_1 != string::npos) {
+						bool flag = false;
+						string cur = "";
+						for (int i = 0; i < token.size(); i++) {
+							if (token[i] == '<') {
+								flag = true;
+								if (!cur.empty()) {
+									current.push_back(cur);
+									cur = "";
+								}
+							}
+							cur += token[i];
+							if (token[i] == '>') {
+								flag = false;
+								current.push_back(cur);
+								cur = "";
+							}
+						}
+						if (!cur.empty()) {
+							current.push_back(cur);
+						}
+					}
+					else
+						current.push_back(token);
 				}
-				current.push_back(_token_);
 			}
 		}
 
 		if (!current.empty()) AddProduction(lhs, current);
 
-		if (start_symbol.symbol.empty())
+		if (start_symbol.empty())
 			start_symbol = lhs;
 	}
 
@@ -464,8 +278,8 @@ void SP_Analyzer::LoadRules(ifstream& file) {
 	ifLRecursion();
 }
 
-const set<withAtr> SP_Analyzer::FIRST(withAtr nonterminal, set<withAtr>& visited) {
-	set<withAtr> set_first;
+const set<string> SP_Analyzer::FIRST(string nonterminal, set<string>& visited) {
+	set<string> set_first;
 
 	if (visited.count(nonterminal))
 		return {};
@@ -481,7 +295,7 @@ const set<withAtr> SP_Analyzer::FIRST(withAtr nonterminal, set<withAtr>& visited
 					set_first.insert(rule.symbols[0]);
 				}
 				else {
-					set<withAtr> first = FIRST(rule.symbols[0], visited);
+					set<string> first = FIRST(rule.symbols[0], visited);
 					for (const auto& sym : first) {
 						set_first.insert(sym);
 					}
@@ -536,8 +350,8 @@ const set<string> SP_Analyzer::START(string nonterminal) {
 }
 */
 
-const set<withAtr> SP_Analyzer::START(withAtr nonterminal, set<withAtr>& visited) {
-	set<withAtr> set_start;
+const set<string> SP_Analyzer::START(string nonterminal, set<string>& visited) {
+	set<string> set_start;
 
 	if (visited.count(nonterminal))
 		return {};
@@ -551,7 +365,7 @@ const set<withAtr> SP_Analyzer::START(withAtr nonterminal, set<withAtr>& visited
 			for (const auto& rule : rules) {
 				set_start.insert(rule.symbols[0]);
 				if (isNonterminal(rule.symbols[0])) {
-					set<withAtr> start = START(rule.symbols[0], visited);
+					set<string> start = START(rule.symbols[0], visited);
 					for (const auto& sym : start) {
 						set_start.insert(sym);
 					}
@@ -564,8 +378,8 @@ const set<withAtr> SP_Analyzer::START(withAtr nonterminal, set<withAtr>& visited
 
 
 
-const set<withAtr> SP_Analyzer::END(withAtr nonterminal, set<withAtr>& visited) {
-	set<withAtr> set_end;
+const set<string> SP_Analyzer::END(string nonterminal, set<string>& visited) {
+	set<string> set_end;
 
 	// Если данный nonterminal уже раскрывался
 	if (visited.count(nonterminal))
@@ -579,10 +393,10 @@ const set<withAtr> SP_Analyzer::END(withAtr nonterminal, set<withAtr>& visited) 
 	for (const auto& [lhs, rules] : productions) {
 		if (lhs == nonterminal) {
 			for (const auto& rule : rules) {
-				withAtr s = *rule.symbols.rbegin();
+				string s = *rule.symbols.rbegin();
 				set_end.insert(s);
 				if (isNonterminal(s)) {
-					set<withAtr> end = END(s, visited);
+					set<string> end = END(s, visited);
 					for (const auto& sym : end) {
 						set_end.insert(sym);
 					}
@@ -841,12 +655,12 @@ bool SP_Analyzer::CheckGrammar() {
 		for (const auto& prod : rules) {
 			auto it_row = precedence_table.find("$");
 			if (it_row != precedence_table.end()) {
-				set<withAtr> visited;
-				set<withAtr> start = START(start_symbol, visited);
+				set<string> visited;
+				set<string> start = START(start_symbol, visited);
 				for (const auto& syms : start) {
-					auto it_col = it_row->second.find(syms.symbol);
+					auto it_col = it_row->second.find(syms);
 					if (it_col == it_row->second.end()) {
-						precedence_table["$"][syms.symbol] = '<';
+						precedence_table["$"][syms] = '<';
 					}
 					else {
 						if (it_col->second != '<') {
@@ -858,39 +672,39 @@ bool SP_Analyzer::CheckGrammar() {
 				}
 			}
 			else {
-				set<withAtr> visited;
-				set<withAtr> first = FIRST(start_symbol, visited);
+				set<string> visited;
+				set<string> first = FIRST(start_symbol, visited);
 				for (const auto& syms : first) {
-					precedence_table["$"][syms.symbol] = '<';
+					precedence_table["$"][syms] = '<';
 				}
 			}
 
 			for (int i = 0; i < prod.symbols.size() - 1; i++) {
 				// Проверка, существует ли ключ prod.symbols[i] в таблице
-				it_row = precedence_table.find(prod.symbols[i].symbol);
+				it_row = precedence_table.find(prod.symbols[i]);
 				if (it_row != precedence_table.end()) {
 					// Строка найдена — проверяем столбец
-					auto it_col = it_row->second.find(prod.symbols[i + 1].symbol);
+					auto it_col = it_row->second.find(prod.symbols[i + 1]);
 					if (it_col == it_row->second.end()) {
 						// Ячейка ещё не заполнена — можно присвоить
-						precedence_table[prod.symbols[i].symbol][prod.symbols[i + 1].symbol] = '=';
+						precedence_table[prod.symbols[i]][prod.symbols[i + 1]] = '=';
 						if (isNonterminal(prod.symbols[i + 1])) {
 							//cout << "START вызван здесь" << endl;
-							set<withAtr> visited;
+							set<string> visited;
 							
-							set<withAtr> start = START(prod.symbols[i + 1], visited);
+							set<string> start = START(prod.symbols[i + 1], visited);
 							for (const auto& syms : start) {
 								// Теперь для отношения <•
-								it_col = it_row->second.find(syms.symbol);
+								it_col = it_row->second.find(syms);
 								if (it_col == it_row->second.end()) {
 									// Ячейка ещё не заполнена — можно присвоить
-									precedence_table[prod.symbols[i].symbol][syms.symbol] = '<';
+									precedence_table[prod.symbols[i]][syms] = '<';
 								}
 								else {
 									if (it_col->second != '<') {
 										// Ячейка уже была заполнена и она не '<' — можно обработать конфликт
 										cout << "Конфликт: уже было " << it_col->second << ", а хотим записать <" << endl;
-										cout << "Конфликт между " << prod.symbols[i].symbol << " и " << syms.symbol << endl;
+										cout << "Конфликт между " << prod.symbols[i] << " и " << syms << endl;
 										return false;
 									}
 								}
@@ -898,35 +712,35 @@ bool SP_Analyzer::CheckGrammar() {
 						}
 						if (isNonterminal(prod.symbols[i])) {
 							//cout << "END вызван здесь" << endl;
-							set<withAtr> visited;
-							set<withAtr> end = END(prod.symbols[i], visited);
+							set<string> visited;
+							set<string> end = END(prod.symbols[i], visited);
 							for (const auto& syms : end) {
 								//cout << "FIRST вызван здесь" << endl;
-								set<withAtr> visited;
-								set<withAtr> first = FIRST(prod.symbols[i + 1], visited);
+								set<string> visited;
+								set<string> first = FIRST(prod.symbols[i + 1], visited);
 								for (const auto& syms_next : first) {
 									// Теперь для отношения •>
 									// Проверка, существует ли ключ syms = END(prod.symbols[i]) в таблице
-									it_row = precedence_table.find(syms.symbol);
+									it_row = precedence_table.find(syms);
 									if (it_row != precedence_table.end()) {
 										// Строка найдена — проверяем столбец
-										it_col = it_row->second.find(syms_next.symbol);
+										it_col = it_row->second.find(syms_next);
 										if (it_col == it_row->second.end()) {
 											// Ячейка ещё не заполнена — можно присвоить
-											precedence_table[syms.symbol][syms_next.symbol] = '>';
+											precedence_table[syms][syms_next] = '>';
 										}
 										else {
 											if (it_col->second != '>') {
 												// Ячейка уже была заполнена и она не '>' — можно обработать конфликт
 												cout << "Конфликт: уже было " << it_col->second << ", а хотим записать >" << endl;
-												cout << "Конфликт между " << syms.symbol << " и " << syms_next.symbol << endl;
+												cout << "Конфликт между " << syms << " и " << syms_next << endl;
 												return false;
 											}
 										}
 									}
 									else {
 										// Строка не найдена — можно безопасно создать
-										precedence_table[syms.symbol][syms_next.symbol] = '>';
+										precedence_table[syms][syms_next] = '>';
 									}
 								}
 
@@ -937,31 +751,31 @@ bool SP_Analyzer::CheckGrammar() {
 						if (it_col->second != '=') {
 							// Ячейка уже была заполнена и она не '=' — можно обработать конфликт
 							cout << "Конфликт: уже было " << it_col->second << ", а хотим записать =" << endl;
-							cout << "Конфликт между " << prod.symbols[i].symbol << " и " << prod.symbols[i + 1].symbol << endl;
+							cout << "Конфликт между " << prod.symbols[i] << " и " << prod.symbols[i + 1] << endl;
 							return false;
 						}
 					}
 				}
 				else {
 					// Строка не найдена — можно безопасно создать
-					precedence_table[prod.symbols[i].symbol][prod.symbols[i + 1].symbol] = '=';
-					it_row = precedence_table.find(prod.symbols[i].symbol);
+					precedence_table[prod.symbols[i]][prod.symbols[i + 1]] = '=';
+					it_row = precedence_table.find(prod.symbols[i]);
 					if (isNonterminal(prod.symbols[i + 1])) {
 						//cout << "START вызван здесь" << endl;
-						set<withAtr> visited;
-						set<withAtr> start = START(prod.symbols[i + 1], visited);
+						set<string> visited;
+						set<string> start = START(prod.symbols[i + 1], visited);
 						for (const auto& syms : start) {
 							// Теперь для отношения <•
-							auto it_col = it_row->second.find(syms.symbol);
+							auto it_col = it_row->second.find(syms);
 							if (it_col == it_row->second.end()) {
 								// Ячейка ещё не заполнена — можно присвоить
-								precedence_table[prod.symbols[i].symbol][syms.symbol] = '<';
+								precedence_table[prod.symbols[i]][syms] = '<';
 							}
 							else {
 								if (it_col->second != '<') {
 									// Ячейка уже была заполнена и она не '<' — можно обработать конфликт
 									cout << "Конфликт: уже было " << it_col->second << ", а хотим записать <" << endl;
-									cout << "Конфликт между " << prod.symbols[i].symbol << " и " << syms.symbol << endl;
+									cout << "Конфликт между " << prod.symbols[i] << " и " << syms << endl;
 									return false;
 								}
 							}
@@ -969,37 +783,37 @@ bool SP_Analyzer::CheckGrammar() {
 					}
 					if (isNonterminal(prod.symbols[i])) {
 						//cout << "END вызван здесь" << endl;
-						set<withAtr> visited;
-						set<withAtr> end = END(prod.symbols[i], visited);
+						set<string> visited;
+						set<string> end = END(prod.symbols[i], visited);
 						for (const auto& syms : end) {
 							//cout << "FIRST вызван здесь" << endl;
-							set<withAtr> visited;
-							set<withAtr> first = FIRST(prod.symbols[i + 1], visited);
+							set<string> visited;
+							set<string> first = FIRST(prod.symbols[i + 1], visited);
 							for (const auto& syms_next : first) {
 								// Теперь для отношения •>
 								// Проверка, существует ли ключ syms = END(prod.symbols[i]) в таблице
-								it_row = precedence_table.find(syms.symbol);
+								it_row = precedence_table.find(syms);
 								if (it_row != precedence_table.end()) {
 									// Строка найдена — проверяем столбец
-									auto it_col = it_row->second.find(syms_next.symbol);
+									auto it_col = it_row->second.find(syms_next);
 									if (it_col == it_row->second.end()) {
 										// Ячейка ещё не заполнена — можно присвоить
-										precedence_table[syms.symbol][syms_next.symbol] = '>';
+										precedence_table[syms][syms_next] = '>';
 									}
 									else {
 										if (it_col->second != '>') {
 											// Ячейка уже была заполнена и она не '>' — можно обработать конфликт
 											cout << "Конфликт: уже было " << it_col->second << ", а хотим записать >" << endl;
-											cout << "Конфликт между " << syms.symbol << " и " << syms_next.symbol << endl;
+											cout << "Конфликт между " << syms << " и " << syms_next << endl;
 											cout << "Посещённые элементы во время высчитывания END: ";
 											for (const auto& elem : visited)
-												cout << elem.symbol << " ";
+												cout << elem << " ";
 											cout << endl;
-											cout << "END(" << prod.symbols[i].symbol << "): ";
+											cout << "END(" << prod.symbols[i] << "): ";
 											for (const auto& elem : end)
-												cout << elem.symbol << " ";
+												cout << elem << " ";
 											cout << endl;
-											cout << "Порождены были из " << prod.symbols[i].symbol << " и " << prod.symbols[i + 1].symbol;
+											cout << "Порождены были из " << prod.symbols[i] << " и " << prod.symbols[i + 1];
 											cout << endl;
 											return false;
 										}
@@ -1007,7 +821,7 @@ bool SP_Analyzer::CheckGrammar() {
 								}
 								else {
 									// Строка не найдена — можно безопасно создать
-									precedence_table[syms.symbol][syms_next.symbol] = '>';
+									precedence_table[syms][syms_next] = '>';
 								}
 							}
 
@@ -1015,15 +829,15 @@ bool SP_Analyzer::CheckGrammar() {
 					}
 				}
 			}
-			set<withAtr> visited;
+			set<string> visited;
 			//cout << "END вызван здесь" << endl;
-			set<withAtr> end = END(start_symbol, visited);
+			set<string> end = END(start_symbol, visited);
 			for (const auto& syms : end) {
-				it_row = precedence_table.find(syms.symbol);
+				it_row = precedence_table.find(syms);
 				if (it_row != precedence_table.end()) {
 					auto it_col = it_row->second.find("$");
 					if (it_col == it_row->second.end()) {
-						precedence_table[syms.symbol]["$"] = '>';
+						precedence_table[syms]["$"] = '>';
 					}
 					else {
 						if (it_col->second != '>') {
@@ -1035,7 +849,7 @@ bool SP_Analyzer::CheckGrammar() {
 				}
 				else {
 					// Строка не найдена — можно безопасно создать
-					precedence_table[syms.symbol]["$"] = '>';
+					precedence_table[syms]["$"] = '>';
 				}
 			}
 		}
@@ -1045,8 +859,8 @@ bool SP_Analyzer::CheckGrammar() {
 
 void SP_Analyzer::ifUseless() {
 	for (const auto& nont : nonterminals)
-		if (!isInSet(nont, terminals) && nont.symbol != "S") {
-			cout << "Имеется бесполезный нетерминал " << nont.symbol << endl;
+		if (!isInSet(nont, terminals) && nont != "S") {
+			cout << "Имеется бесполезный нетерминал " << nont << endl;
 			flag_SP = false;
 		}
 
@@ -1057,9 +871,9 @@ void SP_Analyzer::ifLRecursion() {
 		for (const auto& prod : rules) {
 			if (lhs == prod.symbols[0]) {
 				cout << "Имеется левая рекурсия: ";
-				cout << lhs.symbol << " -> ";
+				cout << lhs << " -> ";
 				for (const auto& syms : prod.symbols) {
-					cout << syms.symbol << ' ';
+					cout << syms << ' ';
 				}
 				cout << endl;
 				flag_SP = false;

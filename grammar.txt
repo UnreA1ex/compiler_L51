@@ -50,7 +50,7 @@ S -> <prog>
 <op> -> <select> <bran> ni ;
 <select> -> select <E> in
 <bran> -> <bran'>
-<bran'> -> <case> <bran'> | <otherwise>
+<bran'> -> <case> <bran'> | <otherwise> | <case>
 <case> -> case C <colon> <prog>
 <colon> -> :
 <otherwise> -> otherwise <prog>
@@ -58,9 +58,9 @@ S -> <prog>
 <op> -> afm ( <E> )
 
 <E> -> <T><E'> | <T>
-<E'> -> + <T><E'> | - <T><E'> | + <T> | - <T>
+<E'> -> + <T><E'> | - <T><E'> | ^ <T><E'> | + <T> | - <T> | ^ <T>
 <T> -> <F><T'> | <F>
-<T'> -> * <F><T'> | / <F><T'> | % <F><T'> | * <F> | / <F> | % <F>
+<T'> -> * <F><T'> | / <F><T'> | % <F><T'> | & <F><T'> | * <F> | / <F> | % <F> | & <F>
 <F> -> C | V | ( <E> ) | pow ( <E> )
 <F> -> m | acs ( <E><comma> <E_bracket>
 <E_bracket> -> <E> )
