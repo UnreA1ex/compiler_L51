@@ -1,0 +1,22 @@
+read
+pop n
+push 0
+pop sum
+push 1
+pop i
+push i
+push n
+>
+ji 20
+push sum
+push i
++
+pop sum
+push i
+push 1
++
+pop i
+jmp 7
+push sum
+write
+end

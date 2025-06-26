@@ -1,5 +1,52 @@
-/* Now we'll check uncorrect symbols */
-/* Ready for many error lines... */
-
-@ ! # $ % ^ & * () _ - + = ] [ \ | /
-? "" { } ' ~ `
+read
+pop n
+push n
+push 1
+!=
+ji 12
+push 1
+pop result
+push result
+write
+jmp 52
+push 1
+pop result
+push 2
+pop i
+push i
+push n
+>=
+ji 50
+push i
+pop a
+push n
+pop b
+push b
+push 0
+=
+ji 37
+push a
+push b
+%
+pop temp
+push b
+pop a
+push temp
+pop b
+jmp 24
+push a
+push 1
+!=
+ji 45
+push result
+push 1
++
+pop result
+push i
+push 1
++
+pop i
+jmp 16
+push result
+write
+end

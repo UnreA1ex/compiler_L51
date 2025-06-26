@@ -1,54 +1,60 @@
-ad:
-/* Example with variable declaring */
-dim _x1, x1, x2, x3, x_, _x, y as int;
-dim m1, m2, m3 as multiset;
-
-
-/* That's initialisation */
-let _x = 0;
-let x1 = 1;
-let x2 = x1;
-let x3 = _x;
-let m1 = $1, 2, 2,   4,3, 87, 0$;
-
-/* Input operator */
-read x_, y;
-
-while_:
-/* While and for */
-while _x < 10 do
-	let _x = _x + 1; 
-od;
-for x3 from pow($1, 2, 2$ + $1$) to pow(m1) by 2 do
-	let m1 = afm(m1); 
-	let m1 = afm(m1 + m1);
-od;
-
-lab1:
-
-/* Output operator */
-write _x, x_; 
-write m1;
-
-/* That's a label */
-jump while_;
-
-/* Now we check correction of select-case */
-
-select y in 
-	case 1: 
-		let x3 = x3 + 1;
-	case 2:
-		let x3 = x3 + 2;
-	case 3:
-		let x3 = x3 + 3;
-	otherwise bad;
-ni;
-
-/* That's all operators in my program! */
-
-/* Oh, that's empty operator */
-;
-/* Forgot about it... */
-
-
+read
+pop n
+push n
+push 0
+>
+ji 10
+push 0
+write
+jmp 60
+push n
+pop result
+push 2
+pop i
+push i
+push i
+*
+push n
+>
+ji 48
+push n
+push i
+%
+push 0
+!=
+ji 43
+push n
+push i
+%
+push 0
+!=
+ji 37
+push n
+push i
+/
+pop n
+jmp 26
+push result
+push result
+push i
+/
+-
+pop result
+push i
+push 1
++
+pop i
+jmp 14
+push n
+push 1
+<=
+ji 58
+push result
+push result
+push i
+/
+-
+pop result
+push result
+write
+end
