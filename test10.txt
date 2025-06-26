@@ -1,0 +1,30 @@
+/* Euler function */
+
+dim n, i, result as int;
+
+read n;
+
+if (n <= 0)
+	write 0;
+	jump end_;
+fi;
+
+let result = n;
+let i = 2;
+
+while i * i <= n do
+	if (n % i == 0)
+		while n % i == 0 do
+			let n = n / i;
+		od;
+		let result = result - result / i;
+	fi;
+	let i = i + 1;
+od;
+
+if (n > 1)
+	let result = result - result / i;
+fi;
+
+write result;
+end_:

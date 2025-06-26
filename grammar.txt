@@ -55,13 +55,11 @@ S -> <prog>
 <colon> -> :
 <otherwise> -> otherwise <prog>
 
-<op> -> afm ( <E> )
-
 <E> -> <T><E'> | <T>
 <E'> -> + <T><E'> | - <T><E'> | ^ <T><E'> | + <T> | - <T> | ^ <T>
 <T> -> <F><T'> | <F>
 <T'> -> * <F><T'> | / <F><T'> | % <F><T'> | & <F><T'> | * <F> | / <F> | % <F> | & <F>
-<F> -> C | V | ( <E> ) | pow ( <E> )
+<F> -> C | V | ( <E> ) | pow ( <E> ) | afm ( <E> )
 <F> -> m | acs ( <E><comma> <E_bracket>
 <E_bracket> -> <E> )
 <comma> -> ,

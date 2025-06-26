@@ -6,12 +6,13 @@
 
 int main() {
 	setlocale(LC_ALL, "Rus");
-	string filename_P("test7.txt");
+	string filename_P("test12.txt");
 
 	Tokenizer tokenizer;
 	auto tokens = tokenizer.tokenize(filename_P);
-
-	/*cout << "List of lexems:\n";
+	
+	/*
+	cout << "List of lexems:\n";
 	for (const auto& [type, value, line] : tokens) {
 		cout << "Lexem: " << left << setw(15) << tokenizer.tokenClassToString(type) << "\tValue: " << left << setw(18) << value.str << "\tLine: " << line << endl;
 	}
@@ -21,7 +22,8 @@ int main() {
 			cout << error_line << " ";
 		cout << endl;
 	}
-	cout << "---------------------------------------------------------------" << endl;*/
+	cout << "---------------------------------------------------------------" << endl;
+	*/
 
 	//SP_Analyzer g;
 	ifstream file_G("grammar.txt");

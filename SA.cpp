@@ -105,6 +105,110 @@ string TokenToString(tuple<SymbolicTokenClass, TokenValue, int> token) {
 //    }
 //}
 
+void replaceAll(string& str, const string& from, const string& to) {
+    size_t pos = 0;
+    while ((pos = str.find(from, pos)) != string::npos) {
+        str.replace(pos, from.length(), to);
+        pos += to.length(); // Чтобы избежать бесконечного цикла при замене на подстроку
+    }
+}
+
+string insertLabels(string str, const map<string, int>& replacements) {
+    // Создаем вектор пар (ключ, значение) для сортировки по убыванию длины ключа
+    vector<pair<string, int>> sortedReplacements(replacements.begin(), replacements.end());
+
+    // Сортируем по длине ключа в убывающем порядке
+    sort(sortedReplacements.begin(), sortedReplacements.end(),
+        [](const auto& a, const auto& b) {
+            return a.first.length() > b.first.length();
+        });
+
+    // Производим замену
+    for (const auto& [key, value] : sortedReplacements) {
+        replaceAll(str, key, to_string(value));
+    }
+
+    return str;
+}
+
+// Удаление последовательных дубликатов \n
+string removeEmptys(const string& str) {
+    string result = str;
+
+    
+    auto new_end = unique(result.begin(), result.end(),
+        [](char a, char b) {
+            return a == '\n' && b == '\n';
+        });
+
+    result.erase(new_end, result.end());
+    return result;
+}
+
+// Функция для тримминга \n в начале и конце + очистка внутри
+string trimAndRemoveEmptys(const string& str) {
+    if (str.empty()) return "";
+
+    // 1. Тримминг: находим первый и последний символы, не \n
+    size_t start = str.find_first_not_of('\n');
+    size_t end = str.find_last_not_of('\n');
+
+    // Если строка состоит только из \n, возвращаем пустую
+    if (start == string::npos || end == string::npos) {
+        return "";
+    }
+
+    // Вырезаем подстроку без \n по краям
+    string trimmed = str.substr(start, end - start + 1);
+
+    // 2. Удаляем лишние \n внутри
+    return removeEmptys(trimmed);
+}
+
+string Syntax_Analyzer::ConnectedLabels(const string& program) {
+    int line = 1;
+    vector<string> program_str;
+    istringstream iss(program);
+    string p_line;
+    string correct = "";
+    while (std::getline(iss, p_line)) {
+        program_str.push_back(p_line);
+    }
+    for (size_t i = 0; i < program_str.size(); i++) {
+        const auto& elem = program_str[i];
+        size_t ind = elem.find("label");
+        if (ind != string::npos) {
+            table_labels_[elem.substr(ind + 6)] = line;
+            //cout << elem.substr(ind + 6) << endl;
+            program_str.erase(program_str.begin() + line - 1);
+            i--;
+        }
+        else
+            line++;
+    }
+    /*for (const auto& elem : program_str) {
+        cout << elem << endl;
+    }*/
+
+    for (auto& elem : program_str) {
+        if (elem.find("jmp") != string::npos) {
+            elem = "jmp " + to_string(table_labels_[elem.substr(4)]);
+            //cout << elem << endl;
+        }
+        if (elem.find("ji") != string::npos) {
+            elem = "ji " + to_string(table_labels_[elem.substr(3)]);
+            /*cout << table_labels_[elem.substr(4)] << " ";
+            cout << elem << endl;*/
+        }
+    }
+
+    for (const auto& elem : program_str) {
+        correct = correct + elem + "\n";
+    }
+    correct.pop_back();
+    return correct;
+}
+
 ofstream out("output.txt");
 
 string Syntax_Analyzer::resolveLabel(const std::string& userLabel) {
@@ -176,7 +280,10 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                 //cout << std::get<1>(tokens.front()).str << endl;
             }
             if (cur_token == "R") {
-                temp.atrs.push_back(std::get<1>(tokens.front()).str);
+                if (std::get<1>(tokens.front()).str == "==")
+                    temp.atrs.push_back("=");
+                else
+                    temp.atrs.push_back(std::get<1>(tokens.front()).str);
                 //cout << std::get<1>(tokens.front()).str << endl;
             }
             if (cur_token == "C") {
@@ -287,6 +394,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             s = prod[1].atrs[0] + "\n+\n" + prod[2].atrs[0];
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back(prod[1].atrs[1]);
+                            lineCounter += 1;
                             break;
                         // <E'> -> - <T> <E'>
                         case 1:
@@ -298,6 +406,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             s = prod[1].atrs[0] + "\n-\n" + prod[2].atrs[0];
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back(prod[1].atrs[1]);
+                            lineCounter += 1;
                             break;
                         // <E'> -> ^ <T> <E'>
                         case 2:
@@ -309,24 +418,28 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             s = prod[1].atrs[0] + "\n^\n" + prod[2].atrs[0];
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back(prod[1].atrs[1]);
+                            lineCounter += 1;
                             break;
                         // <E'> -> + <T>
                         case 3:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back(prod[1].atrs[0] + "\n" + "+");
                             cur_1.atrs.push_back(prod[1].atrs[1]);
+                            lineCounter += 1;
                             break;
                         // <E'> -> - <T>
                         case 4:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back(prod[1].atrs[0] + "\n" + "-");
                             cur_1.atrs.push_back(prod[1].atrs[1]);
+                            lineCounter += 1;
                             break;
                         // <E'> -> ^ <T>
                         case 5:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back(prod[1].atrs[0] + "\n" + "^");
                             cur_1.atrs.push_back(prod[1].atrs[1]);
+                            lineCounter += 1;
                             break;
                         // <E> -> <T> <E'>
                         case 6:
@@ -358,6 +471,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             s = "push " + std::get<1>(tok).str;
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back("int");
+                            lineCounter += 1;
                             break;
                         // <F> -> V
                         case 10:
@@ -391,6 +505,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                                     }
                                 }
                             cur_1.atrs.push_back(cur_var.type);
+                            lineCounter += 1;
                             break;
                         // <F> -> ( <E> )
                         case 11:
@@ -408,17 +523,31 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             s = prod[2].atrs[0] + "\npow";
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back("int");
+                            lineCounter += 1;
+                            break;
+                        // <F> -> afm ( <E> )
+                        case 13:
+                            if (prod[2].atrs[1] != "multiset") {
+                                cout << "Ошибка: Неверный тип аргумента при вызове функции" << endl;
+                                return;
+                            }
+                            cur_1.symbol = lhs;
+                            s = prod[2].atrs[0] + "\nafm";
+                            cur_1.atrs.push_back(s);
+                            cur_1.atrs.push_back("multiset");
+                            lineCounter += 1;
                             break;
                         // <F> -> m
-                        case 13:
+                        case 14:
                             cur_1.symbol = lhs;
                             //string s = "push " + *(std::get<1>(tokens.front()).pInt);
                             s = "push " + std::get<1>(tok).str;
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back("multiset");
+                            lineCounter += 1;
                             break;
                         // <F> -> acs ( <E> <comma> <E_bracket>
-                        case 14:
+                        case 15:
                             if ((prod[2].atrs[1] != "multiset") || (prod[4].atrs[1] != "int")) {
                                 cout << "Ошибка: Неверные типы аргументов при вызове функции" << endl;
                                 return;
@@ -427,9 +556,10 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             s = prod[2].atrs[0] + "\n" + prod[4].atrs[0] + "\nacs";
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back("int");
+                            lineCounter += 1;
                             break;
                         // <T'> -> * <F> <T'>
-                        case 15:
+                        case 16:
                             if (prod[1].atrs[1] != prod[2].atrs[1]) {
                                 cout << "Ошибка: Несоответствие типов в выражении :(" << endl;
                                 return;
@@ -438,9 +568,10 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             s = prod[1].atrs[0] + "\n*\n" + prod[2].atrs[0];
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back(prod[1].atrs[1]);
+                            lineCounter += 1;
                             break;
                         // <T'> -> / <F> <T'>
-                        case 16:
+                        case 17:
                             if (prod[1].atrs[1] != prod[2].atrs[1]) {
                                 cout << "Ошибка: Несоответствие типов в выражении :(" << endl;
                                 return;
@@ -449,9 +580,10 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             s = prod[1].atrs[0] + "\n/\n" + prod[2].atrs[0];
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back(prod[1].atrs[1]);
+                            lineCounter += 1;
                             break;
                         // <T'> -> % <F> <T'>
-                        case 17:
+                        case 18:
                             if (prod[1].atrs[1] != prod[2].atrs[1]) {
                                 cout << "Ошибка: Несоответствие типов в выражении :(" << endl;
                                 return;
@@ -460,9 +592,10 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             s = prod[1].atrs[0] + "\n%\n" + prod[2].atrs[0];
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back(prod[1].atrs[1]);
+                            lineCounter += 1;
                             break;
                         // <T'> -> & <F> <T'>
-                        case 18:
+                        case 19:
                             if (prod[1].atrs[1] != prod[2].atrs[1]) {
                                 cout << "Ошибка: Несоответствие типов в выражении :(" << endl;
                                 return;
@@ -471,37 +604,42 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             s = prod[1].atrs[0] + "\n&\n" + prod[2].atrs[0];
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back(prod[1].atrs[1]);
+                            lineCounter += 1;
                             break;
                         // <T'> -> * <F>
-                        case 19:
+                        case 20:
                             cur_1.symbol = lhs;
                             s = prod[1].atrs[0] + "\n" + "*";
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back(prod[1].atrs[1]);
+                            lineCounter += 1;
                             break;
                         // <T'> -> / <F>
-                        case 20:
+                        case 21:
                             cur_1.symbol = lhs;
                             s = prod[1].atrs[0] + "\n" + "/";
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back(prod[1].atrs[1]);
+                            lineCounter += 1;
                             break;
                         // <T'> -> % <F>
-                        case 21:
+                        case 22:
                             cur_1.symbol = lhs;
                             s = prod[1].atrs[0] + "\n" + "%";
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back(prod[1].atrs[1]);
+                            lineCounter += 1;
                             break;
                         // <T'> -> & <F>
-                        case 22:
+                        case 23:
                             cur_1.symbol = lhs;
                             s = prod[1].atrs[0] + "\n" + "&";
                             cur_1.atrs.push_back(s);
                             cur_1.atrs.push_back(prod[1].atrs[1]);
+                            lineCounter += 1;
                             break;
                         // <T> -> <F> <T'>
-                        case 23:
+                        case 24:
                             if (prod[0].atrs[1] != prod[1].atrs[1]) {
                                 cout << "Ошибка: Несоответствие типов в выражении :(" << endl;
                                 return;
@@ -512,13 +650,13 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             cur_1.atrs.push_back(prod[0].atrs[1]);
                             break;
                         // <T> -> <F>
-                        case 24:
+                        case 25:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back(prod[0].atrs[0]);
                             cur_1.atrs.push_back(prod[0].atrs[1]);
                             break;
                         // <announ> -> <vl> as <type> ;
-                        case 25:
+                        case 26:
                             for (auto& elem : list_variables) {
                                 elem.atrs.push_back(prod[2].atrs[0]);
                             }
@@ -543,7 +681,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             cur_1.atrs.push_back("");
                             break;
                         // <bran'> -> <case> <bran'>
-                        case 26:
+                        case 27:
                             cur_1.symbol = lhs;
                             s = prod[0].atrs[0] + "\njmp " + prod[1].atrs[3] + "\n" + prod[1].atrs[0];
                             cur_1.atrs.push_back(s);
@@ -552,9 +690,10 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             list_consts = prod[0].atrs[2] + " " + prod[1].atrs[2];
                             cur_1.atrs.push_back(list_consts);
                             cur_1.atrs.push_back(prod[1].atrs[3]);
+                            lineCounter += 1;
                             break;
                         // <bran'> -> <otherwise>
-                        case 27:
+                        case 28:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back(prod[0].atrs[0]);
                             cur_1.atrs.push_back(prod[0].atrs[1]);
@@ -562,16 +701,17 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             cur_1.atrs.push_back(prod[0].atrs[3]);
                             break;
                         // <bran'> -> <case>
-                        case 28:
+                        case 29:
                             cur_1.symbol = lhs;
                             r = newLabel();
                             cur_1.atrs.push_back(prod[0].atrs[0] + "\nlabel " + r + "\n");
                             cur_1.atrs.push_back(prod[0].atrs[1]);
                             cur_1.atrs.push_back(prod[0].atrs[2]);
                             cur_1.atrs.push_back(r);
+                            lineCounter += 1;
                             break;
                         // <bran> -> <bran'>
-                        case 29:
+                        case 30:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back(prod[0].atrs[0]);
                             cur_1.atrs.push_back(prod[0].atrs[1]);
@@ -579,7 +719,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             cur_1.atrs.push_back(prod[0].atrs[3]);
                             break;
                         // <case> -> case C <colon> <prog>
-                        case 30:
+                        case 31:
                             cur_1.symbol = lhs;
                             r = newLabel();
                             s = "label " + r + "\n" + prod[3].atrs[0];
@@ -588,22 +728,23 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             cur_1.atrs.push_back(list_labels);
                             list_consts = prod[1].atrs[0];
                             cur_1.atrs.push_back(list_consts);
+                            lineCounter += 1;
                             break;
                         // <colon> -> :
-                        case 31:
-                            cur_1.symbol = lhs;
-                            break;
-                        // <comma> -> ,
                         case 32:
                             cur_1.symbol = lhs;
                             break;
-                        // <else> -> else <prog>
+                        // <comma> -> ,
                         case 33:
+                            cur_1.symbol = lhs;
+                            break;
+                        // <else> -> else <prog>
+                        case 34:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back(prod[1].atrs[0]);
                             break;
                         // <for_1> -> <for_3> do <prog>
-                        case 34:
+                        case 35:
                             cur_1.symbol = lhs;
                             m1 = newLabel();
                             m2 = newLabel();
@@ -622,9 +763,10 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                                 "jmp " + m1 + "\n" +
                                 "label " + m2;
                             cur_1.atrs.push_back(s);
+                            lineCounter += 10;
                             break;
                         // <for_2> -> <for_4> do <prog>
-                        case 35:
+                        case 36:
                             cur_1.symbol = lhs;
                             m1 = newLabel();
                             m2 = newLabel();
@@ -643,9 +785,10 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                                 "jmp " + m1 + "\n" +
                                 "label " + m2;
                             cur_1.atrs.push_back(s);
+                            lineCounter += 11;
                             break;
                         // <for_3> -> for V from <E> to <E> <step>
-                        case 36:
+                        case 37:
                             cur_1.symbol = lhs;
                             flag_1 = false;
                             flag_2 = false;
@@ -675,7 +818,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             cur_1.atrs.push_back(prod[6].atrs[0]);
                             break;
                         // <for_4> -> for V from <E> to <E>
-                        case 37:
+                        case 38:
                             cur_1.symbol = lhs;
                             flag_1 = false;
                             flag_2 = false;
@@ -704,21 +847,22 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             cur_1.atrs.push_back(prod[5].atrs[0]);
                             break;
                         // <if_1> -> if <test_if> <prog>
-                        case 38:
+                        case 39:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back(prod[1].atrs[0]);
                             cur_1.atrs.push_back(prod[2].atrs[0]);
                             break;
                         // <label> -> L
-                        case 39:
+                        case 40:
                             cur_1.symbol = lhs;
                             r = prod[0].atrs[0];
                             table_jumplabels.push_back(prod[0].atrs[0]);
-                            s = "jmp " + r;
+                            s = "jmp " + prod[0].atrs[0];
                             cur_1.atrs.push_back(s);
+                            lineCounter += 1;
                             break;
                         // <let> -> let V = <E>
-                        case 40:
+                        case 41:
                             cur_1.symbol = lhs;
                             flag_1 = false;
                             flag_2 = false;
@@ -809,19 +953,20 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             }
                             if (!count(ifInited_variables.begin(), ifInited_variables.end(), cur_var.var))
                                 ifInited_variables.push_back(cur_var.var);
+                            lineCounter += 1;
                             break;
                         // <op> -> /*комментарий*/
-                        case 41:
-                            cur_1.symbol = lhs;
-                            cur_1.atrs.push_back("");
-                            break;
-                        // <op> -> ;
                         case 42:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back("");
                             break;
-                        // <op> -> L :
+                        // <op> -> ;
                         case 43:
+                            cur_1.symbol = lhs;
+                            cur_1.atrs.push_back("");
+                            break;
+                            // <op> -> L :
+                        case 44:
                             cur_1.symbol = lhs;
                             r = prod[0].atrs[0];
                             flag_2 = false;
@@ -838,40 +983,41 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             table_labels.push_back(prod[0].atrs[0]);
                             s = "label " + r;
                             cur_1.atrs.push_back(s);
+                            lineCounter += 1;
                             break;
-                        // <op> -> bad ;
-                        case 44:
+                        case 45:
                             cur_1.symbol = lhs;
                             s = "end";
                             cur_1.atrs.push_back(s);
+                            lineCounter += 1;
                             break;
                         // <op> -> <announ>
-                        case 45:
-                            cur_1.symbol = lhs;
-                            cur_1.atrs.push_back(prod[0].atrs[0]);
-                            break;
-                        // <op> -> <let> ;
                         case 46:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back(prod[0].atrs[0]);
                             break;
-                        // <op> -> <while> od ;
+                        // <op> -> <let> ;
                         case 47:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back(prod[0].atrs[0]);
                             break;
-                        // <op> -> <for_1> od ;
+                        // <op> -> <while> od ;
                         case 48:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back(prod[0].atrs[0]);
                             break;
-                        // <op> -> <for_2> od ;
+                        // <op> -> <for_1> od ;
                         case 49:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back(prod[0].atrs[0]);
                             break;
-                        // <op> -> <if_1> fi ;
+                        // <op> -> <for_2> od ;
                         case 50:
+                            cur_1.symbol = lhs;
+                            cur_1.atrs.push_back(prod[0].atrs[0]);
+                            break;
+                        // <op> -> <if_1> fi ;
+                        case 51:
                             cur_1.symbol = lhs;
                             m = newLabel();
                             s = prod[0].atrs[0] + "\n" +
@@ -879,9 +1025,10 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                                 prod[0].atrs[1] + "\n" +
                                 "label " + m;
                             cur_1.atrs.push_back(s);
+                            lineCounter += 2;
                             break;
                         // <op> -> <if_1> <else> fi ;
-                        case 51:
+                        case 52:
                             cur_1.symbol = lhs;
                             m1 = newLabel();
                             m2 = newLabel();
@@ -893,24 +1040,25 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                                 prod[1].atrs[0] + "\n" +
                                 "label " + m2;
                             cur_1.atrs.push_back(s);
+                            lineCounter += 4;
                             break;
                         // <op> -> <read> ;
-                        case 52:
-                            cur_1.symbol = lhs;
-                            cur_1.atrs.push_back(prod[0].atrs[0]);
-                            break;
-                        // <op> -> <write> ;
                         case 53:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back(prod[0].atrs[0]);
                             break;
-                        // <op> -> jump <label> ;
+                        // <op> -> <write> ;
                         case 54:
+                            cur_1.symbol = lhs;
+                            cur_1.atrs.push_back(prod[0].atrs[0]);
+                            break;
+                        // <op> -> jump <label> ;
+                        case 55:
                             cur_1.symbol = lhs;
                             cur_1.atrs.push_back(prod[1].atrs[0]);
                             break;
                         // <op> -> <select> <bran> ni ;
-                        case 55:
+                        case 56:
                             cur_1.symbol = lhs;
                             r = prod[0].atrs[0].substr(5);
                             ss_labels.str(prod[1].atrs[1]);
@@ -934,18 +1082,19 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             }
                             s = s + "jmp " + r_ + "\n" + prod[1].atrs[0];
                             cur_1.atrs.push_back(s);
+                            lineCounter = lineCounter + 4 * case_consts.size();
                             break;
-                        // <op> -> afm ( <E> )
-                        case 56:
-                            if (prod[2].atrs[1] != "multiset") {
-                                cout << "Ошибка: Неверный тип аргумента при вызове функции" << endl;
-                                return;
-                            }
-                            cur_1.symbol = lhs;
-                            s = prod[2].atrs[0] + "\n" +
-                                "afm";
-                            cur_1.atrs.push_back(s);
-                            break;
+                        //// <op> -> afm ( <E> )
+                        //case 57:
+                        //    if (prod[2].atrs[1] != "multiset") {
+                        //        cout << "Ошибка: Неверный тип аргумента при вызове функции" << endl;
+                        //        return;
+                        //    }
+                        //    cur_1.symbol = lhs;
+                        //    s = prod[2].atrs[0] + "\n" +
+                        //        "afm";
+                        //    cur_1.atrs.push_back(s);
+                        //    break;
                         // <op_in> -> <read> ,
                         case 57:
                             cur_1.symbol = lhs;
@@ -958,6 +1107,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                                 "write\n" +
                                 prod[2].atrs[0];
                             cur_1.atrs.push_back(s);
+                            lineCounter += 1;
                             break;
                         // <op_out> -> <E>
                         case 59:
@@ -965,6 +1115,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             s = prod[0].atrs[0] + "\n" +
                                 "write";
                             cur_1.atrs.push_back(s);
+                            lineCounter += 1;
                             break;
                         // <otherwise> -> otherwise <prog>
                         case 60:
@@ -978,6 +1129,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             cur_1.atrs.push_back(r);
                             cur_1.atrs.push_back("");
                             cur_1.atrs.push_back(atr4);
+                            lineCounter += 2;
                             break;
                         // <prog> -> <op> <prog>
                         case 61:
@@ -1008,6 +1160,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             s = "read\npop " + prod[1].atrs[0];
                             ifInited_variables.push_back(prod[1].atrs[0]);
                             cur_1.atrs.push_back(s);
+                            lineCounter += 2;
                             break;
                         // <read> -> <op_in> V
                         case 64:
@@ -1015,6 +1168,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                             s = prod[0].atrs[0] + "\nread\npop " + prod[1].atrs[0];
                             ifInited_variables.push_back(prod[1].atrs[0]);
                             cur_1.atrs.push_back(s);
+                            lineCounter += 2;
                             break;
                         // <select> -> select <E> in
                         case 65:
@@ -1045,6 +1199,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                                 prod[3].atrs[0] + "\n" +
                                 OTR(prod[2].atrs[0]);
                             cur_1.atrs.push_back(s);
+                            lineCounter += 1;
                             break;
                         // <test_w> -> <E> R <E>
                         case 68:
@@ -1057,6 +1212,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                                 prod[2].atrs[0] + "\n" +
                                 OTR(prod[1].atrs[0]);
                             cur_1.atrs.push_back(s);
+                            lineCounter += 1;
                             break;
                         // <type> -> int
                         case 69:
@@ -1094,6 +1250,7 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
                                 "jmp " + m1 + "\n" +
                                 "label " + m2;
                             cur_1.atrs.push_back(s);
+                            lineCounter += 4;
                             break;
                         // <write> -> write <op_out>
                         case 75:
@@ -1157,10 +1314,15 @@ void Syntax_Analyzer::Parse(string filename_P, ifstream& file_G) {
     if (flag_l)
         return;
 
+    
+
     // Финальная проверка успешного разбора
     if (magazine.size() == 2 && magazine.back().symbol == g.start_symbol) {
+        magazine.back().atrs[0] = trimAndRemoveEmptys(magazine.back().atrs[0]);
+        magazine.back().atrs[0] = ConnectedLabels(magazine.back().atrs[0]);
         cout << "Разбор завершён успешно!" << endl;
         ShowProgram();
+        //cout << endl << lineCounter << endl;
         /*if (!parse_stack.empty()) {
             ParseTreeNode* root = parse_stack.top();
             PrintTree(root, 0);
@@ -1187,6 +1349,7 @@ void Syntax_Analyzer::ShowHistory() {
         cout << endl;
     }
 }
+
 
 //void Syntax_Analyzer::PrintTree(ParseTreeNode* node, int depth = 0) {
 //    if (!node) return;
@@ -1499,12 +1662,16 @@ void Syntax_Analyzer::ShowHistory() {
 //}
 
 void Syntax_Analyzer::ShowProgram() {
-    cout << magazine.back().atrs[0];
+    cout << "Программа на стековом языке:\n" << endl;
+    cout << magazine.back().atrs[0] + "\nend";
+    lineCounter++;
 }
 
 string Syntax_Analyzer::OTR(string R) {
-    if (R == "==")
+    if (R == "=")
         return "!=";
+    if (R == "!=")
+        return "=";
     if (R == "<")
         return ">=";
     if (R == "<=")

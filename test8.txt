@@ -1,0 +1,13 @@
+/* Some tests with afm and pow */
+
+dim m as multiset;
+dim x as int;
+
+read m;
+
+let m = afm(m);
+let m = m + $7, 7, 7$ - $0$;
+write m;
+write pow(m);
+let x = pow(afm(m));
+write x;

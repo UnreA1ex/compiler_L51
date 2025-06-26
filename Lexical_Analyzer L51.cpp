@@ -533,7 +533,7 @@ vector<tuple<SymbolicTokenClass, TokenValue, int>> Tokenizer::tokenize(string fi
                 else if (ch == '/' && input[pos + 1] == '*') {
                     Read_Comment();
                 }
-                else if (operators.count(string(1, ch))) {
+                else if (operators.count(string(1, ch)) || ch == '!') {
                     Read_Operator();
                 }
                 else if (separators.find(ch) != string::npos) {

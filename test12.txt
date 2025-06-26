@@ -1,0 +1,16 @@
+dim y, x3 as int;
+
+let x3 = 0;
+read y;
+
+select y in 
+	case 1: 
+		let x3 = x3 + 1;
+	case 2:
+		let x3 = x3 + 2;
+	case 3:
+		let x3 = x3 + 3;
+	otherwise bad;
+ni;
+
+write x3;

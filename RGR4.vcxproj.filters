@@ -106,6 +106,21 @@
     <Text Include="atr_gram2.txt">
       <Filter>Файлы ресурсов\grammars</Filter>
     </Text>
+    <Text Include="test8.txt">
+      <Filter>Файлы ресурсов\test_progs</Filter>
+    </Text>
+    <Text Include="test9.txt">
+      <Filter>Файлы ресурсов\test_progs</Filter>
+    </Text>
+    <Text Include="test10.txt">
+      <Filter>Файлы ресурсов\test_progs</Filter>
+    </Text>
+    <Text Include="test11.txt">
+      <Filter>Файлы ресурсов\test_progs</Filter>
+    </Text>
+    <Text Include="test12.txt">
+      <Filter>Файлы ресурсов\test_progs</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\class_multiset\input1">
